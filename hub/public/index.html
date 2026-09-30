@@ -8,30 +8,35 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
-  <header>
+<header class="hero hero-home">
+  <div class="wrap">
+    <p class="eyebrow">Master 2026–2027</p>
     <h1>Technical Medicine</h1>
-    <p class="subtitle">Samenvattingen, toetsanalyses en uitwerkingen per vak, van Max Veerhoek.</p>
-  </header>
-  <section>
-    <h2>Vakken</h2>
-    <ul id="courses">
-      <li><a href="asa/"><span class="doc">TM12001 Advanced Signal Acquisition</span><span class="meta" data-slug="asa"></span></a></li>
-      <li><a href="dsd/"><span class="doc">TM12004 Drug Sensing and Delivery</span><span class="meta" data-slug="dsd"></span></a></li>
-      <li><a href="pc/"><span class="doc">TM10006 Patient Cases</span><span class="meta" data-slug="pc"></span></a></li>
-      <li><a href="ms/"><span class="doc">TM10004 Medical Skills</span><span class="meta" data-slug="ms"></span></a></li>
-      <li><a href="qsux/"><span class="doc">TM10012 Quality, Safety &amp; UX in Healthcare</span><span class="meta" data-slug="qsux"></span></a></li>
-    </ul>
-  </section>
+    <p class="lead">Samenvattingen, toetsanalyses en uitwerkingen per vak. Elke pagina toont de laatste versie.</p>
+  </div>
+</header>
+<main class="wrap">
+  <ul class="cards">
+    <li><a href="asa/"><span class="code">TM12001</span><span class="name">Advanced Signal Acquisition</span><span class="meta" data-slug="asa"></span></a></li>
+    <li><a href="dsd/"><span class="code">TM12004</span><span class="name">Drug Sensing and Delivery</span><span class="meta" data-slug="dsd"></span></a></li>
+    <li><a href="pc/"><span class="code">TM10006</span><span class="name">Patient Cases</span><span class="meta" data-slug="pc"></span></a></li>
+    <li><a href="ms/"><span class="code">TM10004</span><span class="name">Medical Skills</span><span class="meta" data-slug="ms"></span></a></li>
+    <li><a href="qsux/"><span class="code">TM10012</span><span class="name">Quality, Safety &amp; UX in Healthcare</span><span class="meta" data-slug="qsux"></span></a></li>
+  </ul>
 </main>
+<footer>
+  <div class="wrap">
+    <p>Persoonlijke studiedocumenten van Max Veerhoek. Geen officieel lesmateriaal en niet verbonden aan een universiteit of ziekenhuis.</p>
+  </div>
+</footer>
 <script>
 // Each course publishes its own manifest; show when it last changed.
 const day = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long", timeZone: "Europe/Amsterdam" });
 for (const el of document.querySelectorAll("[data-slug]")) {
   fetch(`${el.dataset.slug}/manifest.json`)
     .then((r) => (r.ok ? r.json() : Promise.reject()))
-    .then((m) => { el.textContent = `bijgewerkt op ${day.format(new Date(m.updated))}`; })
-    .catch(() => { el.textContent = "nog niet gepubliceerd"; });
+    .then((m) => { el.textContent = `${m.docs.length} ${m.docs.length === 1 ? "document" : "documenten"} · bijgewerkt op ${day.format(new Date(m.updated))}`; })
+    .catch(() => { el.textContent = "Nog niet gepubliceerd"; });
 }
 </script>
 </body>

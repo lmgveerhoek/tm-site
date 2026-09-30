@@ -1,14 +1,15 @@
 // Builds the public page for one course repo: compiles every document listed in
-// that repo's site.json and writes <out>/<slug>/{index.html,manifest.json,*.pdf}.
+// that repo's site.yaml (or site.yml / site.json) and writes <out>/<slug>/{index.html,manifest.json,*.pdf}.
 //
 //   node build.ts --repo ../TM12001-advanced-signal-acquisition --out dist [--fonts fonts]
 //
-// No dependencies; Node >= 24 runs this file directly.
+// Node >= 24 runs this file directly. Run `npm ci` once for the YAML parser.
 
 import { execFileSync, spawnSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { parse as parseYaml } from "yaml";
 
 interface Doc {
   section: string;
@@ -30,6 +31,8 @@ interface Site {
   slug: string;
   title: string;
   subtitle?: string;
+  /** Course code shown above the title, for example "TM12001". */
+  code?: string;
   /** Set to true to let search engines index the page. */
   index?: boolean;
   docs: Doc[];
@@ -54,7 +57,10 @@ if (!args.repo) fail("usage: node build.ts --repo <course repo> [--out dist] [--
 
 const repo = resolve(args.repo);
 const here = import.meta.dirname;
-const site: Site = JSON.parse(readFileSync(join(repo, "site.json"), "utf8"));
+// YAML is a superset of JSON, so one parser reads all three.
+const configName = ["site.yaml", "site.yml", "site.json"].find((name) => existsSync(join(repo, name)));
+if (!configName) fail(`no site.yaml, site.yml or site.json in ${repo}`);
+const site: Site = parseYaml(readFileSync(join(repo, configName), "utf8"));
 validate(site);
 
 const outDir = join(resolve(args.out), site.slug);
@@ -81,6 +87,7 @@ for (const doc of site.docs) {
 const commit = git(["rev-parse", "--short", "HEAD"]);
 const manifest = {
   slug: site.slug,
+  code: site.code,
   title: site.title,
   commit,
   updated: built.map((d) => d.updated).sort().at(-1),
@@ -88,7 +95,7 @@ const manifest = {
 };
 writeFileSync(join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 writeFileSync(join(outDir, "index.html"), render());
-console.log(`built ${built.length} documents into ${outDir}`);
+console.log(`built ${built.length} document(s) into ${outDir}`);
 
 function compile(doc: Doc, target: string): void {
   const cmd = ["compile", "--root", repo];
@@ -154,7 +161,7 @@ function render(): string {
       .map(
         (d) => `<li><a href="${esc(encodeURI(d.file))}">
           <span class="doc">${esc(d.title)}${d.note ? `<small>${esc(d.note)}</small>` : ""}</span>
-          <span class="meta"><time datetime="${d.updated}">${day(d.updated)}</time> · ${mb(d.bytes)} MB</span>
+          <span class="meta"><time datetime="${d.updated}">${day(d.updated)}</time> · PDF, ${mb(d.bytes)} MB</span>
         </a></li>`,
       )
       .join("\n");
@@ -163,6 +170,7 @@ function render(): string {
 
   const fields: Record<string, string> = {
     title: esc(site.title),
+    code: esc(site.code ?? ""),
     subtitle: esc(site.subtitle ?? ""),
     robots: site.index ? "" : '<meta name="robots" content="noindex">',
     updated: day(manifest.updated!),
@@ -173,21 +181,21 @@ function render(): string {
 }
 
 function validate(s: Site): void {
-  if (!/^[a-z0-9-]+$/.test(s.slug ?? "")) fail("site.json: slug must be lowercase letters, digits or dashes");
-  if (!s.title) fail("site.json: title is required");
+  if (!/^[a-z0-9-]+$/.test(s.slug ?? "")) fail(`${configName}: slug must be lowercase letters, digits or dashes`);
+  if (!s.title) fail(`${configName}: title is required`);
   const seen = new Set<string>();
   for (const d of s.docs ?? []) {
     const label = d.title ?? "(untitled)";
-    if (!d.section || !d.title) fail(`site.json: "${label}" needs a section and a title`);
-    if (!d.typ === !d.pdf) fail(`site.json: "${label}" needs exactly one of typ or pdf`);
-    if (d.typ && !d.out) fail(`site.json: "${label}" needs out`);
+    if (!d.section || !d.title) fail(`${configName}: "${label}" needs a section and a title`);
+    if (!d.typ === !d.pdf) fail(`${configName}: "${label}" needs exactly one of typ or pdf`);
+    if (d.typ && !d.out) fail(`${configName}: "${label}" needs out`);
     const file = d.out ?? basename(d.pdf!);
-    if (!/^[\w.-]+\.pdf$/.test(file)) fail(`site.json: "${label}" has an invalid output name: ${file}`);
-    if (seen.has(file)) fail(`site.json: output name used twice: ${file}`);
+    if (!/^[\w.-]+\.pdf$/.test(file)) fail(`${configName}: "${label}" has an invalid output name: ${file}`);
+    if (seen.has(file)) fail(`${configName}: output name used twice: ${file}`);
     seen.add(file);
-    if (!existsSync(join(repo, d.typ ?? d.pdf!))) fail(`site.json: "${label}" points to a missing file: ${d.typ ?? d.pdf}`);
+    if (!existsSync(join(repo, d.typ ?? d.pdf!))) fail(`${configName}: "${label}" points to a missing file: ${d.typ ?? d.pdf}`);
   }
-  if (seen.size === 0) fail("site.json: docs is empty");
+  if (seen.size === 0) fail(`${configName}: docs is empty`);
 }
 
 function day(iso: string): string {

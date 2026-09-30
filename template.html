@@ -4,18 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {{robots}}
-<title>{{title}}</title>
+<title>{{code}} {{title}}</title>
 <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-<main>
-  <nav><a href="../">← Alle vakken</a></nav>
-  <header>
+<header class="hero">
+  <div class="wrap">
+    <nav aria-label="Kruimelpad"><a href="../">Technical Medicine</a><span aria-hidden="true">/</span><span>{{code}}</span></nav>
+    <p class="eyebrow">{{code}}</p>
     <h1>{{title}}</h1>
-    <p class="subtitle">{{subtitle}}</p>
+    <p class="lead">{{subtitle}}</p>
     <p class="stamp">Laatst bijgewerkt op {{updated}} · versie <code>{{commit}}</code></p>
-  </header>
+  </div>
+</header>
+<main class="wrap">
   {{sections}}
 </main>
+<footer>
+  <div class="wrap">
+    <p>Persoonlijke studiedocumenten van Max Veerhoek. Geen officieel lesmateriaal en niet verbonden aan een universiteit of ziekenhuis.</p>
+  </div>
+</footer>
 </body>
 </html>

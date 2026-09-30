@@ -3,15 +3,15 @@
 Generator and landing page for the public Technical Medicine study site. Each
 course repo publishes its own page; this repo holds what they share.
 
-- `build.ts` builds one course page from that repo's `site.json`.
-- `template.html` is the course page; `hub/public/` is the landing page and the stylesheet.
+- `build.ts` builds one course page from that repo's `site.yaml` (or `site.json`).
+- `template.html` is the course page; `hub/public/` is the landing page, the stylesheet and the self-hosted fonts (Montserrat and Lato, SIL Open Font License 1.1).
 - `.github/workflows/publish.yml` is the reusable workflow every course repo calls on a push to `main`.
 - `.github/workflows/hub.yml` deploys the landing page.
 
 ## How a course page updates
 
 A push to `main` in a course repo starts its `.github/workflows/site.yml`, which
-calls `publish.yml` here. That compiles every document in `site.json` with
+calls `publish.yml` here. That compiles every document in the site config with
 Typst, writes `dist/<slug>/`, and deploys it as the Worker `tm-<slug>` on
 `tm.veerhoek.eu/<slug>/`. If a document fails to compile nothing is deployed and
 the live page stays as it was.
@@ -19,17 +19,28 @@ the live page stays as it was.
 Course pages are not rebuilt when this repo changes. Run "Publish site" by hand
 in a course repo (Actions tab) to pick up a new template.
 
-## site.json
+## site.yaml
 
-```json
-{
-  "slug": "asa",
-  "title": "TM12001 Advanced Signal Acquisition",
-  "docs": [
-    { "section": "Samenvatting", "title": "Volledige samenvatting", "typ": "summary/main.typ", "out": "samenvatting.pdf" },
-    { "section": "Opdrachten", "title": "Opdrachten lecture 1", "pdf": "assignments/print-ready/ASA-Lecture-1-Assignments.pdf" }
-  ]
-}
+The config may be `site.yaml`, `site.yml` or `site.json`; the first one found is used.
+
+```yaml
+slug: asa
+code: TM12001
+title: Advanced Signal Acquisition
+subtitle: Samenvatting, stappenplannen en toetsanalyse
+docs:
+  - section: Samenvatting
+    title: Volledige samenvatting
+    typ: summary/main.typ
+    out: samenvatting.pdf
+  - section: Per lecture
+    title: Lecture 2
+    typ: summary/main.typ
+    inputs: { only: lecture-2 }
+    out: lecture-2.pdf
+  - section: Opdrachten
+    title: Opdrachten lecture 1
+    pdf: assignments/print-ready/ASA-Lecture-1-Assignments.pdf
 ```
 
 Only what is listed is published. Per document:
@@ -48,6 +59,7 @@ Set `"index": true` at the top level to let search engines index the page.
 ## Local build
 
 ```bash
+npm ci
 node build.ts --repo ../TM12001-advanced-signal-acquisition --out dist
 ```
 

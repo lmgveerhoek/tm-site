@@ -1,5 +1,5 @@
 # Reusable workflow: builds the page for the calling course repo from its
-# site.json and deploys it to Cloudflare under <domain>/<slug>/.
+# site.yaml (or site.json) and deploys it to Cloudflare under <domain>/<slug>/.
 name: Publish course page
 
 on:
@@ -53,13 +53,15 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ghostscript fonts-liberation fonts-dejavu-core
 
       - name: Build
-        run: node tm-site/build.ts --repo course --out dist
+        run: |
+          npm ci --prefix tm-site
+          node tm-site/build.ts --repo course --out dist
 
       # Without the Cloudflare secrets the build still runs as a check.
       - name: Write Worker config
         if: env.HAS_TOKEN == 'true'
         run: |
-          slug=$(node -p "require('./course/site.json').slug")
+          slug=$(ls dist)
           cat > wrangler.json <<JSON
           {
             "name": "tm-$slug",
