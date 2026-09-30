@@ -1,0 +1,7 @@
+{
+  "name": "tm-hub",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "assets": { "directory": "public" },
+  "routes": [{ "pattern": "tm.veerhoek.eu", "custom_domain": true }]
+}

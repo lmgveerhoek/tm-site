@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Technical Medicine — studiedocumenten</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Technical Medicine</h1>
+    <p class="subtitle">Samenvattingen, toetsanalyses en uitwerkingen per vak, van Max Veerhoek.</p>
+  </header>
+  <section>
+    <h2>Vakken</h2>
+    <ul id="courses">
+      <li><a href="asa/"><span class="doc">TM12001 Advanced Signal Acquisition</span><span class="meta" data-slug="asa"></span></a></li>
+      <li><a href="dsd/"><span class="doc">TM12004 Drug Sensing and Delivery</span><span class="meta" data-slug="dsd"></span></a></li>
+      <li><a href="pc/"><span class="doc">TM10006 Patient Cases</span><span class="meta" data-slug="pc"></span></a></li>
+      <li><a href="ms/"><span class="doc">TM10004 Medical Skills</span><span class="meta" data-slug="ms"></span></a></li>
+      <li><a href="qsux/"><span class="doc">TM10012 Quality, Safety &amp; UX in Healthcare</span><span class="meta" data-slug="qsux"></span></a></li>
+    </ul>
+  </section>
+</main>
+<script>
+// Each course publishes its own manifest; show when it last changed.
+const day = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long", timeZone: "Europe/Amsterdam" });
+for (const el of document.querySelectorAll("[data-slug]")) {
+  fetch(`${el.dataset.slug}/manifest.json`)
+    .then((r) => (r.ok ? r.json() : Promise.reject()))
+    .then((m) => { el.textContent = `bijgewerkt op ${day.format(new Date(m.updated))}`; })
+    .catch(() => { el.textContent = "nog niet gepubliceerd"; });
+}
+</script>
+</body>
+</html>
