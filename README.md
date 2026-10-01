@@ -59,11 +59,12 @@ Set `"index": true` at the top level to let search engines index the page.
 ## Local build
 
 ```bash
-npm ci
-node build.ts --repo ../TM12001-advanced-signal-acquisition --out dist
+mise install
+mise run build -- ../TM12001-advanced-signal-acquisition
+mise run preview
 ```
 
-Needs Node 24 or newer and Typst 0.15.1. PDFs above 25 MiB are downsampled to
+mise installs the pinned Bun and Typst from `mise.toml`. PDFs above 25 MiB are downsampled to
 300 ppi with Ghostscript (`brew install ghostscript`); without it the build
 stops at the first oversized document.
 

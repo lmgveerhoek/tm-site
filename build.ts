@@ -1,15 +1,14 @@
 // Builds the public page for one course repo: compiles every document listed in
 // that repo's site.yaml (or site.yml / site.json) and writes <out>/<slug>/{index.html,manifest.json,*.pdf}.
 //
-//   node build.ts --repo ../TM12001-advanced-signal-acquisition --out dist [--fonts fonts]
+//   bun build.ts --repo ../TM12001-advanced-signal-acquisition --out dist [--fonts fonts]
 //
-// Node >= 24 runs this file directly. Run `npm ci` once for the YAML parser.
+// Runs on Bun (versions pinned in mise.toml); no dependencies.
 
 import { execFileSync, spawnSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { parse as parseYaml } from "yaml";
 
 interface Doc {
   section: string;
@@ -53,14 +52,14 @@ const MAX_BYTES = 25 * 1024 * 1024;
 const { values: args } = parseArgs({
   options: { repo: { type: "string" }, out: { type: "string", default: "dist" }, fonts: { type: "string" } },
 });
-if (!args.repo) fail("usage: node build.ts --repo <course repo> [--out dist] [--fonts <dir>]");
+if (!args.repo) fail("usage: bun build.ts --repo <course repo> [--out dist] [--fonts <dir>]");
 
 const repo = resolve(args.repo);
-const here = import.meta.dirname;
-// YAML is a superset of JSON, so one parser reads all three.
+const here = import.meta.dir;
+// YAML is a superset of JSON, so Bun's built-in YAML parser reads all three.
 const configName = ["site.yaml", "site.yml", "site.json"].find((name) => existsSync(join(repo, name)));
 if (!configName) fail(`no site.yaml, site.yml or site.json in ${repo}`);
-const site: Site = parseYaml(readFileSync(join(repo, configName), "utf8"));
+const site: Site = Bun.YAML.parse(readFileSync(join(repo, configName), "utf8")) as Site;
 validate(site);
 
 const outDir = join(resolve(args.out), site.slug);

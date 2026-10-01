@@ -40,22 +40,18 @@ jobs:
           repository: lmgveerhoek/tm-site
           path: tm-site
 
-      - uses: actions/setup-node@v4
+      # Bun and Typst, at the versions pinned in tm-site/mise.toml.
+      - uses: jdx/mise-action@v2
         with:
-          node-version: 24
-
-      - uses: typst-community/setup-typst@v4
-        with:
-          typst-version: 0.15.1
+          working_directory: tm-site
 
       # Liberation Sans stands in for Arial; Ghostscript downsamples PDFs above 25 MiB.
       - name: Install fonts and Ghostscript
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ghostscript fonts-liberation fonts-dejavu-core
 
       - name: Build
-        run: |
-          npm ci --prefix tm-site
-          node tm-site/build.ts --repo course --out dist
+        working-directory: tm-site
+        run: bun build.ts --repo ../course --out ../dist
 
       # Without the Cloudflare secrets the build still runs as a check.
       - name: Write Worker config
@@ -77,7 +73,7 @@ jobs:
 
       - name: Deploy
         if: env.HAS_TOKEN == 'true'
-        run: npx --yes wrangler@4 deploy --config wrangler.json
+        run: bunx wrangler@4 deploy --config wrangler.json
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

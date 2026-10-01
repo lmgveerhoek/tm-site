@@ -1,0 +1,11 @@
+[tools]
+bun = "1.4.2"
+typst = "0.15.1"
+
+[tasks.build]
+description = "Build one course page: mise run build -- ../TM12001-advanced-signal-acquisition"
+run = "bun build.ts --out dist --repo"
+
+[tasks.preview]
+description = "Serve dist/ on http://localhost:8765 with the landing page"
+run = "cp -R hub/public/. dist/ && bun preview.ts"
