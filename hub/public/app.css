@@ -85,6 +85,7 @@
   transition: background-color 0.15s, padding 0.15s;
 }
 .item:hover, .item:focus-visible { background: color-mix(in srgb, var(--hero) 55%, transparent); padding-inline: 0.75rem; }
+.item::after { content: none; } /* style.css zet al een ↗ op section li a */
 
 .badge {
   flex: none;
