@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Dashboard — Technical Medicine</title>
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="app.css">
 <script src="vendor/js-yaml.min.js"></script>
@@ -12,7 +13,14 @@
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="wordmark" href="#/">TM</a>
+    <a class="wordmark" href="#/" aria-label="Technical Medicine — naar het overzicht">
+      <svg class="logo" viewBox="0 0 40 32" aria-hidden="true" focusable="false">
+        <path d="M2 16 H8 L11 11 L14 22 L17 5 L20 25 L22 16 H26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="29" y="13" width="6" height="6" rx="1" fill="#d8a55b"/>
+        <rect x="36.5" y="14.5" width="3" height="3" rx="0.5" fill="currentColor" opacity="0.45"/>
+      </svg>
+      <span class="logo-text">TM</span>
+    </a>
     <nav class="tabs" aria-label="Hoofdmenu">
       <a href="#/" data-view="overview">Overzicht</a>
       <a href="#/courses" data-view="courses">Vakken</a>

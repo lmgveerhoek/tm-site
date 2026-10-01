@@ -9,10 +9,15 @@ const COURSES = [
 ];
 
 export function render() {
-  return `<div class="wrap page">
-    <p class="eyebrow">Master 2026–2027</p>
-    <h2 class="page-title">Vakken</h2>
-    <p class="page-lead">Samenvattingen, toetsanalyses en uitwerkingen per vak. Elke pagina toont de laatste versie.</p>
+  return `
+  <header class="hero hero-home">
+    <div class="wrap">
+      <p class="eyebrow">Master 2026–2027</p>
+      <h1>Vakken</h1>
+      <p class="lead">Samenvattingen, toetsanalyses en uitwerkingen per vak. Elke pagina toont de laatste versie.</p>
+    </div>
+  </header>
+  <div class="wrap">
     <ul class="cards">${COURSES.map((c) => `
       <li><a href="${c.slug}/"><span class="code">${c.code}</span><span class="name">${esc(c.name)}</span><span class="meta" data-slug="${c.slug}"></span></a></li>`).join("")}
     </ul>
