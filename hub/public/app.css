@@ -1,6 +1,46 @@
-/* Dashboard-specific componenten; baseert op de tokens uit style.css. */
+/* App-shell en dashboardcomponenten; baseert op de tokens uit style.css. */
 
-.hero nav { margin-bottom: 1rem; }
+/* Topbar: sticky, met wordmark en tabnavigatie. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-in { display: flex; align-items: center; gap: 1.75rem; padding-block: 0.65rem; }
+
+.wordmark {
+  font: 700 1.05rem/1 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  color: var(--heading);
+  text-decoration: none;
+}
+.wordmark:hover { color: var(--link); }
+
+.tabs { display: flex; gap: 1.25rem; }
+.tabs a {
+  padding: 0.45rem 0.1rem;
+  font: 700 0.9rem/1.2 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tabs a:hover, .tabs a:focus-visible { color: var(--link); }
+.tabs a.active { color: var(--link); border-bottom-color: var(--ochre); }
+
+/* Weergavewissel: korte fade, behalve bij prefers-reduced-motion. */
+#view.view-in { animation: viewIn 150ms ease-out; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { #view.view-in { animation: none; } }
+
+/* Paginakop voor weergaven zonder hero (zoals Vakken). */
+.page { padding-top: 2.25rem; }
+.page-title { margin-bottom: 0.4rem; }
+.page-lead { margin: 0 0 1rem; max-width: 42rem; font-size: 1.1rem; color: var(--muted); }
+.page .cards { margin-top: 1.25rem; }
 
 /* Tijdlijn: dagen met kop + chip, items als regels. */
 .day { margin-bottom: 1.5rem; }
@@ -121,4 +161,6 @@ li.done .it-title { text-decoration: line-through; }
 @media (max-width: 34rem) {
   .item { flex-wrap: wrap; }
   .it-meta { width: 100%; padding-left: 0.25rem; }
+  .topbar-in { gap: 1rem; }
+  .page { padding-top: 1.5rem; }
 }

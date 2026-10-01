@@ -4,41 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Technical Medicine — studiedocumenten</title>
+<title>Dashboard — Technical Medicine</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="app.css">
+<script src="vendor/js-yaml.min.js"></script>
 </head>
 <body>
-<header class="hero hero-home">
-  <div class="wrap">
-    <p class="eyebrow">Master 2026–2027</p>
-    <h1>Technical Medicine</h1>
-    <p class="lead">Samenvattingen, toetsanalyses en uitwerkingen per vak. Elke pagina toont de laatste versie.</p>
-    <p class="stamp"><a href="dashboard/">Dashboard: deadlines, toetsen &amp; aankondigingen →</a></p>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="wordmark" href="#/">TM</a>
+    <nav class="tabs" aria-label="Hoofdmenu">
+      <a href="#/" data-view="overview">Overzicht</a>
+      <a href="#/courses" data-view="courses">Vakken</a>
+    </nav>
   </div>
 </header>
-<main class="wrap">
-  <ul class="cards">
-    <li><a href="asa/"><span class="code">TM12001</span><span class="name">Advanced Signal Acquisition</span><span class="meta" data-slug="asa"></span></a></li>
-    <li><a href="dsd/"><span class="code">TM12004</span><span class="name">Drug Sensing and Delivery</span><span class="meta" data-slug="dsd"></span></a></li>
-    <li><a href="pc/"><span class="code">TM10006</span><span class="name">Patient Cases</span><span class="meta" data-slug="pc"></span></a></li>
-    <li><a href="ms/"><span class="code">TM10004</span><span class="name">Medical Skills</span><span class="meta" data-slug="ms"></span></a></li>
-    <li><a href="qsux/"><span class="code">TM10012</span><span class="name">Quality, Safety &amp; UX in Healthcare</span><span class="meta" data-slug="qsux"></span></a></li>
-  </ul>
-</main>
+<main id="view"></main>
+<noscript><div class="wrap"><p class="empty">Deze site gebruikt JavaScript voor de weergave. Zet JavaScript aan om het dashboard te zien.</p></div></noscript>
 <footer>
   <div class="wrap">
-    <p>Persoonlijke studiedocumenten van Max Veerhoek. Geen officieel lesmateriaal en niet verbonden aan een universiteit of ziekenhuis.</p>
+    <p>Persoonlijke studiedocumenten van Max Veerhoek. Geen officieel lesmateriaal en niet verbonden aan een universiteit of ziekenhuis. Gegevens afkomstig van Brightspace; controleer daar altijd de bron.</p>
   </div>
 </footer>
-<script>
-// Each course publishes its own manifest; show when it last changed.
-const day = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long", timeZone: "Europe/Amsterdam" });
-for (const el of document.querySelectorAll("[data-slug]")) {
-  fetch(`${el.dataset.slug}/manifest.json`)
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
-    .then((m) => { el.textContent = `${m.docs.length} ${m.docs.length === 1 ? "document" : "documenten"} · bijgewerkt op ${day.format(new Date(m.updated))}`; })
-    .catch(() => { el.textContent = "Nog niet gepubliceerd"; });
-}
-</script>
+<script type="module" src="app.js"></script>
 </body>
 </html>

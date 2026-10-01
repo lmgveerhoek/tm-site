@@ -1,6 +1,7 @@
 # Dashboard-sync
 
-De dashboardpagina op `tm.veerhoek.eu/dashboard/` leest `hub/public/dashboard/data.yaml`.
+Het dashboard is de startpagina van `tm.veerhoek.eu/` (app-shell, standaardweergave
+"Overzicht") en leest `hub/public/data/dashboard.yaml`.
 Dit bestand is de bron van waarheid en wordt bijgewerkt door een agentsessie (handmatig
 of via de dagelijkse OpenChamber-taak "dashboard-sync") die deze runbook volgt.
 
@@ -22,7 +23,7 @@ of via de dagelijkse OpenChamber-taak "dashboard-sync") die deze runbook volgt.
    | TM10012 | qsux | 845119 |
 
    Aankondigingen van organisatie-"vakken" (zoals Students Mechanical Engineering) vallen weg.
-3. Werk `hub/public/dashboard/data.yaml` bij:
+3. Werk `hub/public/data/dashboard.yaml` bij:
    - `items`: alles wat komt (vandaag en later), gesorteerd op `due`. Bestaande items
      herken je aan hun `id` (`bs-`/`bse-` + Brightspace-id). **Behoud altijd** de velden
      `done`, `note` en alle items met `source: manual`; ze zijn van Max, niet van Brightspace.
@@ -51,7 +52,7 @@ of via de dagelijkse OpenChamber-taak "dashboard-sync") die deze runbook volgt.
 
    ```sh
    cd tm-site
-   bun -e 'const d = Bun.YAML.parse(await Bun.file("hub/public/dashboard/data.yaml").text()); if (!d.items || !d.announcements || !d.synced_at) process.exit(1); console.log("yaml ok:", d.items.length, "items")'
+   bun -e 'const d = Bun.YAML.parse(await Bun.file("hub/public/data/dashboard.yaml").text()); if (!d.items || !d.announcements || !d.synced_at) process.exit(1); console.log("yaml ok:", d.items.length, "items")'
    ```
 
    Bij gewijzigde data: commit naar `main` met een kort bericht als `Sync dashboard data`
