@@ -1,0 +1,5 @@
+#!/bin/sh
+# Publish one recording for tm-site and print its site.json entry.
+# Usage: tm-video --repo <course-repo> --file <recording> --name <name> --title "…" [options]
+set -eu
+exec bun "$(dirname "$0")/../video.ts" "$@"
