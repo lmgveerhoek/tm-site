@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .chip { fill: #a9d6ee; }
+    .pulse { stroke: #00216d; }
+    @media (prefers-color-scheme: dark) {
+      .chip { fill: #102a55; }
+      .pulse { stroke: #cfe9f7; }
+    }
+  </style>
+  <rect class="chip" width="64" height="64" rx="14"/>
+  <path class="pulse" d="M10 32 H20 L25 24 L30 40 L36 14 L42 44 L46 32 H50" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="52.5" y="28.5" width="7" height="7" rx="1.5" fill="#d8a55b"/>
+</svg>
