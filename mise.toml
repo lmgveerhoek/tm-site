@@ -13,3 +13,7 @@ run = "cp -R hub/public/. dist/ && bun preview.ts"
 [tasks.cloudflare-secrets]
 description = "Sync Cloudflare Actions secrets from 1Password to all six repos (also for rotation)"
 run = "bun cloudflare-secrets.ts"
+
+[tasks.video]
+description = "Publish a recording: mise run video -- --repo <course> --file <rec> --name <name> --title <title>"
+run = "bin/tm-video"
