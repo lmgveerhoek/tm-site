@@ -4,6 +4,7 @@ Generator and landing page for the public Technical Medicine study site. Each
 course repo publishes its own page; this repo holds what they share.
 
 - `build.ts` builds one course page from that repo's `site.yaml` (or `site.json`).
+- `bin/tm-video` prepares and uploads lecture videos, then prints an entry for the same course config.
 - `template.html` is the course page; `hub/public/` is the landing page, the stylesheet and the self-hosted fonts (Montserrat and Lato, SIL Open Font License 1.1).
 - `.github/workflows/publish.yml` is the reusable workflow every course repo calls on a push to `main`.
 - `.github/workflows/hub.yml` deploys the landing page.
@@ -60,8 +61,8 @@ Set `"index": true` at the top level to let search engines index the page.
 
 `videos` lists lecture recordings as in-page players. Recordings are far larger
 than the 25 MiB asset limit, so they never pass through git or the build: they
-are published to object storage with `../tm-tools` (`bin/tm-video`, which also
-prints the entry to paste here). The page only embeds and links them.
+are published to object storage with this repo's `bin/tm-video`, which also
+prints the entry to paste here. The page only embeds and links them.
 
 ```yaml
 video_base: https://<bucket>.fsn1.your-objectstorage.com
@@ -88,6 +89,63 @@ videos:
 `VIDEO_BASE` in `build.ts`. The uploader prints content-hashed filenames so
 updated encodes cannot be confused with cached versions. URLs are public;
 noindex pages reduce discoverability but do not restrict access.
+
+### Publishing a recording
+
+From the `tm-site` checkout:
+
+```sh
+bin/tm-video --repo <course-repo> --file <recording.mp4|.mov> --name lecture-5 --title "Lecture 5 — Biomarkers" [options]
+# The same command is available through mise:
+mise run video -- --repo <course-repo> --file <recording> --name lecture-5 --title "Lecture 5 — Biomarkers" [options]
+```
+
+From a course checkout, use `../tm-site/bin/tm-video --repo . --file ...`.
+
+The publisher encodes a web MP4 (`libx264`, CRF 24, AAC, `+faststart`) capped at
+1920×1080 without upscaling, uploads it and the untouched original to the media
+bucket (`<slug>/<name>-<content-hash>.mp4` and
+`<slug>/<name>-original-<content-hash>.<ext>`), then prints the entry to paste
+under `videos`. Original files have `Content-Disposition: attachment`.
+
+The encode is kept in `<recording-directory>/derived/web/<slug>/`. Ignore that
+directory in the recording repository. A cache manifest records the source
+hash, encoding settings and completed output hash. Failed encodes cannot replace
+a completed file; retries reuse only a matching, intact encode. Pass `--reencode`
+to force a new encode. Content-hashed object names make immutable caching safe
+when sources or settings change.
+
+Rclone uploads use S3 system metadata for MIME type, caching and disposition.
+The command checks public access, sizes and MIME types, the original's download
+header, and byte-range seeking before printing the config entry. Uploads run
+locally, independently of the GitHub Actions site build.
+
+Options: `--section` (default "Opnames"), `--date` (default the recording's
+mtime), `--crf`, `--preset`, `--remote` (default `tm-media`), `--bucket` (or
+`TM_VIDEO_BUCKET`), `--base` (public bucket URL; defaults to the course's
+`video_base`), `--reencode`, `--dry-run` (encodes locally but skips uploads and
+network verification). Use `--date` for the lecture date if the file's mtime
+does not reflect it. Configure the public base URL before a real upload.
+
+One-time setup (create the bucket in Hetzner Console first):
+
+```sh
+brew install ffmpeg rclone
+rclone config create tm-media s3 provider=Hetzner env_auth=true \
+  endpoint=https://fsn1.your-objectstorage.com region=fsn1
+```
+
+Inject `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` from 1Password into the
+upload process environment; do not put their values on command lines or in
+repository files. Set `--bucket` and the course's `video_base`, for example
+`https://<bucket>.fsn1.your-objectstorage.com` (match your bucket's location).
+Objects are uploaded with `--s3-acl public-read`.
+
+### Verification
+
+`bun test` runs the site, dashboard and video-publisher tests. The publisher
+tests use local FFmpeg and simulated uploads; no credentials or network uploads
+are needed. GitHub Actions installs FFmpeg and runs this same combined suite.
 
 ## Local build
 

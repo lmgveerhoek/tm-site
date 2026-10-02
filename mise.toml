@@ -9,3 +9,7 @@ run = "bun build.ts --out dist --repo"
 [tasks.preview]
 description = "Serve dist/ on http://localhost:8765 with the landing page"
 run = "cp -R hub/public/. dist/ && bun preview.ts"
+
+[tasks.video]
+description = "Publish a recording: mise run video -- --repo <course> --file <rec> --name <name> --title <title>"
+run = "bin/tm-video"
