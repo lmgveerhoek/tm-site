@@ -29,7 +29,13 @@ export function mounted() {
   for (const el of document.querySelectorAll("[data-slug]")) {
     fetch(`${el.dataset.slug}/manifest.json`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((m) => { el.textContent = `${m.docs.length} ${m.docs.length === 1 ? "document" : "documenten"} · bijgewerkt op ${longFmt.format(new Date(m.updated))}`; })
+      .then((m) => {
+        const docs = m.docs.length;
+        const videos = (m.videos ?? []).length;
+        const counts = [`${docs} ${docs === 1 ? "document" : "documenten"}`];
+        if (videos) counts.push(`${videos} ${videos === 1 ? "opname" : "opnames"}`);
+        el.textContent = `${counts.join(" · ")} · bijgewerkt op ${longFmt.format(new Date(m.updated))}`;
+      })
       .catch(() => { el.textContent = "Nog niet gepubliceerd"; });
   }
 }
