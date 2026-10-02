@@ -7,10 +7,10 @@ on:
     inputs:
       domain:
         type: string
-        default: tm.veerhoek.eu
+        default: tm.allocentric.nl
       zone:
         type: string
-        default: veerhoek.eu
+        default: allocentric.nl
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: false

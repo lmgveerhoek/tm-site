@@ -9,3 +9,7 @@ run = "bun build.ts --out dist --repo"
 [tasks.preview]
 description = "Serve dist/ on http://localhost:8765 with the landing page"
 run = "cp -R hub/public/. dist/ && bun preview.ts"
+
+[tasks.cloudflare-secrets]
+description = "Sync Cloudflare Actions secrets from 1Password to all six repos (also for rotation)"
+run = "bun cloudflare-secrets.ts"
