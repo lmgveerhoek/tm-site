@@ -35,7 +35,13 @@ const day = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long", timeZone: "Eur
 for (const el of document.querySelectorAll("[data-slug]")) {
   fetch(`${el.dataset.slug}/manifest.json`)
     .then((r) => (r.ok ? r.json() : Promise.reject()))
-    .then((m) => { el.textContent = `${m.docs.length} ${m.docs.length === 1 ? "document" : "documenten"} · bijgewerkt op ${day.format(new Date(m.updated))}`; })
+    .then((m) => {
+      const docs = m.docs.length;
+      const vids = (m.videos ?? []).length;
+      const counts = [`${docs} ${docs === 1 ? "document" : "documenten"}`];
+      if (vids) counts.push(`${vids} ${vids === 1 ? "opname" : "opnames"}`);
+      el.textContent = `${counts.join(" · ")} · bijgewerkt op ${day.format(new Date(m.updated))}`;
+    })
     .catch(() => { el.textContent = "Nog niet gepubliceerd"; });
 }
 </script>

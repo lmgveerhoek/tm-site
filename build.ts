@@ -34,7 +34,26 @@ interface Site {
   code?: string;
   /** Set to true to let search engines index the page. */
   index?: boolean;
-  docs: Doc[];
+  /** Public base URL of the recording bucket; overrides VIDEO_BASE below. */
+  video_base?: string;
+  /** Documents are optional only for a recordings-only page. */
+  docs?: Doc[];
+  videos?: Video[];
+}
+
+interface Video {
+  section: string;
+  title: string;
+  /** Encoded MP4 served to the in-page player, under <base>/<slug>/. */
+  file: string;
+  /** Untouched original offered as download, under the same prefix. */
+  original?: string;
+  /** Small line under the title; suits the recording's duration. */
+  note?: string;
+  /** ISO date (YYYY-MM-DD); recordings are untracked, so it is given by hand. */
+  date: string;
+  bytes?: number;
+  originalBytes?: number;
 }
 
 interface Built {
@@ -48,6 +67,10 @@ interface Built {
 
 // Workers static assets reject files above 25 MiB.
 const MAX_BYTES = 25 * 1024 * 1024;
+
+// Recordings are far larger, so they are served from object storage instead.
+// Set this once the bucket exists; a course overrides it with `video_base`.
+const VIDEO_BASE = "";
 
 const { values: args } = parseArgs({
   options: { repo: { type: "string" }, out: { type: "string", default: "dist" }, fonts: { type: "string" } },
@@ -68,7 +91,7 @@ mkdirSync(outDir, { recursive: true });
 
 let fontCache: Set<string> | undefined;
 const built: Built[] = [];
-for (const doc of site.docs) {
+for (const doc of site.docs ?? []) {
   const file = doc.out ?? basename(doc.pdf!);
   const target = join(outDir, file);
   if (doc.typ) compile(doc, target);
@@ -84,17 +107,28 @@ for (const doc of site.docs) {
 }
 
 const commit = git(["rev-parse", "--short", "HEAD"]);
+const videos = site.videos ?? [];
 const manifest = {
   slug: site.slug,
   code: site.code,
   title: site.title,
   commit,
-  updated: built.map((d) => d.updated).sort().at(-1),
+  updated: [...built.map((d) => d.updated), ...videos.map((v) => v.date), ...(videos.length ? [lastCommit([configName])] : [])].sort((a, b) => Date.parse(a) - Date.parse(b)).at(-1),
   docs: built,
+  videos: videos.map((v) => ({
+    section: v.section,
+    title: v.title,
+    note: v.note,
+    file: v.file,
+    original: v.original,
+    updated: v.date,
+    bytes: v.bytes,
+    originalBytes: v.originalBytes,
+  })),
 };
 writeFileSync(join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 writeFileSync(join(outDir, "index.html"), render());
-console.log(`built ${built.length} document(s) into ${outDir}`);
+console.log(`built ${built.length} document(s)${videos.length ? ` and ${videos.length} recording(s)` : ""} into ${outDir}`);
 
 function compile(doc: Doc, target: string): void {
   const cmd = ["compile", "--root", repo];
@@ -153,8 +187,9 @@ function git(cmd: string[]): string {
 }
 
 function render(): string {
+  const base = (site.video_base ?? VIDEO_BASE).replace(/\/+$/, "");
   const sections: string[] = [];
-  for (const name of new Set(built.map((d) => d.section))) {
+  for (const name of new Set([...built.map((d) => d.section), ...videos.map((v) => v.section)])) {
     const rows = built
       .filter((d) => d.section === name)
       .map(
@@ -164,7 +199,20 @@ function render(): string {
         </a></li>`,
       )
       .join("\n");
-    sections.push(`<section><h2>${esc(name)}</h2><ul>\n${rows}\n</ul></section>`);
+    const cards = videos
+      .filter((v) => v.section === name)
+      .map((v) => {
+        const src = `${base}/${site.slug}/${v.file}`;
+        const original = v.original ? `${base}/${site.slug}/${v.original}` : "";
+        return `<li class="video">
+          <h3>${esc(v.title)}${v.note ? `<small>${esc(v.note)}</small>` : ""}</h3>
+          <video controls playsinline preload="none" aria-label="${esc(v.title)}" src="${esc(encodeURI(src))}">Je browser ondersteunt deze videospeler niet. <a href="${esc(encodeURI(src))}">Open de opname</a>.</video>
+          <p class="meta"><time datetime="${v.date}">${day(v.date)}</time>${v.bytes ? ` · ${mb(v.bytes)} MB` : ""}${original ? ` · <a href="${esc(encodeURI(original))}">Download origineel${v.originalBytes ? ` (${mb(v.originalBytes)} MB)` : ""}</a>` : ""}</p>
+        </li>`;
+      })
+      .join("\n");
+    const items = [rows, cards].filter(Boolean).join("\n");
+    sections.push(`<section><h2>${esc(name)}</h2><ul>\n${items}\n</ul></section>`);
   }
 
   const fields: Record<string, string> = {
@@ -180,6 +228,9 @@ function render(): string {
 }
 
 function validate(s: Site): void {
+  if (!s || typeof s !== "object") fail(`${configName}: config must be an object`);
+  if (s.docs !== undefined && !Array.isArray(s.docs)) fail(`${configName}: docs must be an array`);
+  if (s.videos !== undefined && !Array.isArray(s.videos)) fail(`${configName}: videos must be an array`);
   if (!/^[a-z0-9-]+$/.test(s.slug ?? "")) fail(`${configName}: slug must be lowercase letters, digits or dashes`);
   if (!s.title) fail(`${configName}: title is required`);
   const seen = new Set<string>();
@@ -194,7 +245,26 @@ function validate(s: Site): void {
     seen.add(file);
     if (!existsSync(join(repo, d.typ ?? d.pdf!))) fail(`${configName}: "${label}" points to a missing file: ${d.typ ?? d.pdf}`);
   }
-  if (seen.size === 0) fail(`${configName}: docs is empty`);
+  if (seen.size === 0 && !(s.videos?.length)) fail(`${configName}: docs is empty`);
+  const videoBase = s.video_base ?? VIDEO_BASE;
+  if (s.videos?.length && !videoBase) fail(`${configName}: videos need video_base set to the bucket's public URL (or VIDEO_BASE in build.ts)`);
+  if (videoBase) {
+    let url: URL;
+    try { url = new URL(videoBase); } catch { fail(`${configName}: video_base must be a valid HTTPS URL`); }
+    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) fail(`${configName}: video_base must use HTTPS without credentials, query or fragment`);
+  }
+  const videoFiles = new Set<string>();
+  for (const v of s.videos ?? []) {
+    const label = v?.title ?? "(untitled)";
+    if (!v || typeof v !== "object" || typeof v.section !== "string" || !v.section.trim() || typeof v.title !== "string" || !v.title.trim()) fail(`${configName}: video "${label}" needs a section and a title`);
+    if (v.note !== undefined && typeof v.note !== "string") fail(`${configName}: video "${label}" note must be a string (quote durations in YAML)`);
+    if (!/^[\w.-]+\.mp4$/.test(v.file ?? "")) fail(`${configName}: video "${label}" needs an .mp4 file name: ${v.file}`);
+    if (v.original && !/^[\w.-]+\.(mp4|mov|m4v|mkv|webm)$/.test(v.original)) fail(`${configName}: video "${label}" has an invalid original name: ${v.original}`);
+    if (typeof v.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(v.date) || !Number.isFinite(Date.parse(v.date)) || new Date(v.date).toISOString().slice(0, 10) !== v.date) fail(`${configName}: video "${label}" needs a valid date (YYYY-MM-DD; quote it in YAML)`);
+    for (const bytes of [v.bytes, v.originalBytes]) if (bytes !== undefined && (!Number.isSafeInteger(bytes) || bytes < 0)) fail(`${configName}: video "${label}" sizes must be non-negative byte counts`);
+    if (videoFiles.has(v.file)) fail(`${configName}: video file name used twice: ${v.file}`);
+    videoFiles.add(v.file);
+  }
 }
 
 function day(iso: string): string {
