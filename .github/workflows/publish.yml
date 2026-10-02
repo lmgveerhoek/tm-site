@@ -73,7 +73,8 @@ jobs:
 
       - name: Deploy
         if: env.HAS_TOKEN == 'true'
-        run: bunx wrangler@4 deploy --config wrangler.json
+        working-directory: tm-site
+        run: bunx wrangler@4 deploy --config ../wrangler.json
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
