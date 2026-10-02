@@ -1,4 +1,4 @@
-import { KINDS, dayFmt, dateFmt, timeFmt, stampFmt, esc, midnight, dayDiff, chipFor, loadDashboard } from "../lib.js";
+import { KINDS, dayFmt, dateFmt, timeFmt, stampFmt, esc, dayKey, dayDiff, chipFor, loadDashboard } from "../lib.js";
 
 function renderItem(it, courses) {
   const course = courses.find((c) => c.code === it.course);
@@ -22,12 +22,12 @@ function renderGroups(items, courses) {
   if (!items.length) return `<p class="empty">Nog niets bekend via Brightspace.</p>`;
   const groups = new Map();
   for (const it of items) {
-    const key = midnight(new Date(it.due)).toISOString();
+    const key = dayKey(it.due);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(it);
   }
-  return [...groups.entries()].map(([key, list]) => {
-    const due = new Date(key);
+  return [...groups.values()].map((list) => {
+    const due = new Date(list[0].due);
     return `<div class="day">
       <div class="day-head"><h3>${dayFmt.format(due)}</h3>${chipFor(dayDiff(due))}</div>
       <ul>${list.map((it) => renderItem(it, courses)).join("")}</ul>
@@ -35,18 +35,18 @@ function renderGroups(items, courses) {
   }).join("");
 }
 
-export async function render() {
-  const data = await loadDashboard();
+export async function render({ force = false } = {}) {
+  const data = await loadDashboard(force);
   const courses = data.courses ?? [];
 
   const now = new Date();
   const upcoming = (data.items ?? [])
-    .filter((it) => new Date(it.due) >= midnight(now) || dayDiff(new Date(it.due)) === 0)
+    .filter((it) => dayDiff(it.due, now) >= 0)
     .sort((a, b) => new Date(a.due) - new Date(b.due));
   const assess = upcoming.filter((it) => ["exam", "presentation", "assessment"].includes(it.kind));
 
   const byCourse = new Map();
-  for (const a of (data.announcements ?? []).sort((x, y) => new Date(y.posted) - new Date(x.posted))) {
+  for (const a of [...data.announcements].sort((x, y) => new Date(y.posted) - new Date(x.posted))) {
     if (!byCourse.has(a.course)) byCourse.set(a.course, []);
     byCourse.get(a.course).push(a);
   }

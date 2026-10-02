@@ -1,4 +1,4 @@
-import { loadDashboard } from "./lib.js";
+import { dayKey } from "./lib.js";
 import { render as renderOverview } from "./views/overview.js";
 import { render as renderCourses, mounted as mountedCourses } from "./views/courses.js";
 
@@ -9,13 +9,15 @@ const VIEWS = {
 
 const parseHash = () => {
   const name = location.hash.replace(/^#\/?/, "").split("/")[0];
-  return VIEWS[name] ? name : "overview";
+  return Object.hasOwn(VIEWS, name) ? name : "overview";
 };
 
 let current = null;
-let renderedDay = new Date().toDateString();
+let renderedDay = dayKey();
+let navigation = 0;
 
-async function route() {
+async function route(force = false) {
+  const token = ++navigation;
   const name = parseHash();
   const view = VIEWS[name];
   document.title = view.title;
@@ -26,28 +28,37 @@ async function route() {
   }
   if (name !== current) window.scrollTo(0, 0);
   current = name;
-  renderedDay = new Date().toDateString();
 
   const main = document.getElementById("view");
   main.innerHTML = `<div class="wrap"><p class="empty">Laden…</p></div>`;
   try {
-    main.innerHTML = await view.render();
+    const html = await view.render({ force });
+    if (token !== navigation) return;
+    main.innerHTML = html;
+    renderedDay = dayKey();
     view.mounted?.();
     main.classList.remove("view-in");
-    requestAnimationFrame(() => main.classList.add("view-in"));
+    requestAnimationFrame(() => {
+      if (token === navigation) main.classList.add("view-in");
+    });
   } catch {
+    if (token !== navigation) return;
+    renderedDay = dayKey();
     main.innerHTML = `<div class="wrap"><p class="empty">Kon de weergave niet laden — vernieuw de pagina of probeer het later opnieuw.</p></div>`;
   }
 }
 
-// Een tab die open blijft liggen moet na middernacht niet meer "morgen" tonen.
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible") return;
-  if (new Date().toDateString() !== renderedDay) {
-    loadDashboard(true).catch(() => {});
-    route();
+// Ook een continu zichtbare tab moet bij Amsterdam-middernacht verversen.
+function refreshForDayChange() {
+  if (document.visibilityState === "visible" && current === "overview" && dayKey() !== renderedDay) {
+    route(true);
   }
-});
+}
 
-window.addEventListener("hashchange", route);
+document.addEventListener("visibilitychange", () => {
+  refreshForDayChange();
+});
+setInterval(refreshForDayChange, 60_000);
+
+window.addEventListener("hashchange", () => route());
 route();

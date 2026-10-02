@@ -1,72 +1,113 @@
 # Dashboard-sync
 
-Het dashboard is de startpagina van `tm.veerhoek.eu/` (app-shell, standaardweergave
-"Overzicht") en leest `hub/public/data/dashboard.yaml`.
-Dit bestand is de bron van waarheid en wordt bijgewerkt door een agentsessie (handmatig
-of via de dagelijkse OpenChamber-taak "dashboard-sync") die deze runbook volgt.
+Het dashboard is de startpagina van `tm.veerhoek.eu/` en leest
+`hub/public/data/dashboard.yaml`. De dagelijkse OpenChamber-taak `dashboard-sync`
+haalt Brightspace-data op en publiceert alleen een gevalideerd snapshot.
 
-## Procedure
+## Checkout en publicatie
 
-1. Haal data op via de Brightspace MCP-tools:
-   - `get_upcoming_due_dates` met `daysAhead: 45`
-   - `get_calendar_events` van vandaag tot het einde van het kwartaal (default false voor
-     `includeGenerated`; opdrachtdeadlines komen al uit due dates)
-   - `get_announcements` met `count: 20`
-2. Filter op de vakken van dit kwartaal (courseId's, update bij nieuw kwartaal):
+De sync werkt **uitsluitend** in de aparte worktree
+`/Users/max/Documents/technical-medicine/tm-site-dashboard-sync`, met een detached
+HEAD gebaseerd op `origin/main`. De ontwikkelcheckout `tm-site` en zijn branches
+worden nooit gebruikt voor sync-commits.
 
-   | code | slug | courseId |
-   |---|---|---|
-   | TM12001 | asa | 844795 |
-   | TM12004 | dsd | 844797 |
-   | TM10004 | ms | 844825 |
-   | TM10006 | pc | 844835 |
-   | TM10012 | qsux | 845119 |
+De worktree is eenmalig aangemaakt met `git worktree add --detach
+../tm-site-dashboard-sync origin/main`. Bij iedere run:
 
-   Aankondigingen van organisatie-"vakken" (zoals Students Mechanical Engineering) vallen weg.
-3. Werk `hub/public/data/dashboard.yaml` bij:
-   - `items`: alles wat komt (vandaag en later), gesorteerd op `due`. Bestaande items
-     herken je aan hun `id` (`bs-`/`bse-` + Brightspace-id). **Behoud altijd** de velden
-     `done`, `note` en alle items met `source: manual`; ze zijn van Max, niet van Brightspace.
-     Items waarvan de datum voorbij is verdwijnen uit het bestand (de pagina toont ze niet meer).
-   - `announcements`: hooguit de laatste 8 per vak, nieuwste eerst, met een samenvatting
-     van 1–2 zinnen in het Nederlands. Bewaar pinned-aankondigingen.
-   - `synced_at`: nu, in Europe/Amsterdam met offset.
-4. Classificeer elk item met een `kind`:
+1. Controleer dat de sync-worktree detached en volledig schoon is. Zo niet: stop.
+2. Haal `origin/main` op en werk de detached HEAD alleen fast-forward bij. Zolang
+   de dashboard-code en deze runbook nog niet op `main` staan: stop zonder wijzigingen.
+3. Voer in de sync-worktree `bun dashboard-sync.ts prepare` uit. Bewaar de SHA
+   die dit commando teruggeeft als `<base-sha>`. Het commando controleert de checkout,
+   haalt `main` op en weigert achtergebleven ongepubliceerde commits.
+4. Lees het bestaande snapshot voordat je Brightspace ophaalt. Bouw de nieuwe YAML
+   als **candidate buiten de checkout**, bijvoorbeeld in een tijdelijke directory.
+5. Valideer met `bun dashboard-check.ts /absolute/path/candidate.yaml`.
+6. Publiceer met `bun dashboard-sync.ts publish /absolute/path/candidate.yaml <base-sha>`.
+   Dit controleert opnieuw het schema, eigen items/velden en de basiscommit,
+   commit uitsluitend het snapshot en pusht expliciet `HEAD:refs/heads/main`.
+   Er is geen upstream op een ontwikkelbranch nodig. De bestaande workflow
+   `Publish hub` valideert het snapshot opnieuw vóór deployment.
 
-   | kind | wanneer |
-   |---|---|
-   | `deadline` | inleveropdracht (dropbox/assignment) |
-   | `exam` | schriftelijk of mondeling tentamen (toets, tentamen, examen, test) |
-   | `presentation` | presentatie, pitch, poster |
-   | `assessment` | beoordelingsmoment/eindbeoordeling van een opdracht |
-   | `session` | bijeenkomst zonder inlevermoment (practicum, werkgroep, LT-spice-sessie) |
-   | `lecture` | verschijnend materiaal / collegeblok op de kalender |
-   | `other` | past nergens bij |
+Als `main` tussentijds wijzigt, stopt publicatie; maak de candidate dan opnieuw
+vanaf een nieuwe `prepare`-basis. Bij een mislukte push blijft de sync-commit staan
+voor handmatige afhandeling. Nooit force-pushen, resetten, stashen of van branch
+wisselen om een fout te omzeilen. Bij fouten geen nieuwe publicatie of vervolgstappen.
 
-   Bij twijfel: `other` plus een heldere `note`. Voeg een korte Nederlandse `note` toe als
-   de titel onduidelijk is.
-5. Tijden: zet UTC om naar Europe/Amsterdam met offset (`+02:00` zomertijd, `+01:00` na de
-   wissel eind oktober). Kalender-events om 07:00 zonder expliciete tijd in de titel zijn
-   materiaalreleases: `allday: true` zetten.
-6. Valideer en publiceer:
+## Brightspace ophalen: per vak
 
-   ```sh
-   cd tm-site
-   bun -e 'const d = Bun.YAML.parse(await Bun.file("hub/public/data/dashboard.yaml").text()); if (!d.items || !d.announcements || !d.synced_at) process.exit(1); console.log("yaml ok:", d.items.length, "items")'
-   ```
+Gebruik voor **elk** van onderstaande `courseId`'s apart:
 
-   Bij gewijzigde data: commit naar `main` met een kort bericht als `Sync dashboard data`
-   en push. De GitHub-workflow "Publish hub" deployt daarna automatisch. Wijzig je niets,
-   dan commit en push je ook niet.
+| code | slug | courseId |
+|---|---|---|
+| TM12001 | asa | 844795 |
+| TM12004 | dsd | 844797 |
+| TM10004 | ms | 844825 |
+| TM10006 | pc | 844835 |
+| TM10012 | qsux | 845119 |
 
-## Handmatige items
+- `get_upcoming_due_dates` met `courseId` en `daysAhead: 45`.
+- `get_calendar_events` met `courseId`, van vandaag tot het einde van het kwartaal.
+  Laat `includeGenerated` uit: opdrachtdeadlines komen al uit due dates.
+- `get_announcements` met `courseId` en `count: 20`. Dit is **geen** globale
+  aanvraag gevolgd door filtering. Als de respons de count bereikt, verhoog deze
+  en haal hetzelfde vak opnieuw op totdat de respons niet meer begrensd is.
+  Als een toollimiet dit onmogelijk maakt, stop de sync en rapporteer de beperking.
 
-Eigen mijlpalen (mondelinge inschrijvingen, studeerdoelen) voeg je toe met
-`source: manual` en een eigen id (`manual-1`, `manual-2`, …). De sync laat ze met rust.
-Later (zelfstudie-tracker) komen hier ook voortgangsvelden bij; houd de schema-uitbreidingen
-compatibel: alleen velden toevoegen.
+Alle vijf vakken moeten succesvol zijn opgehaald voordat je een candidate maakt.
+Een fout of ontbrekende respons is geen lege lijst. Organisatie-aankondigingen
+en oude cursusinschrijvingen horen niet bij dit snapshot.
+
+## Snapshot samenstellen
+
+- `items`: vandaag en later, gesorteerd op `due`. Dedupliceer opdracht- en
+  kalenderresultaten aan de hand van stabiele bron-ID's (`bs-` en `bse-`).
+  Behoud de bestaande `done`- en `note`-waarden voor terugkerende items.
+- Behoud **alle** `source: manual`-items exact, ook als hun datum voorbij is.
+  Oude Brightspace-items mogen verdwijnen; de pagina verbergt verstreken items.
+- `announcements`: de laatste acht **niet-vastgemaakte** per vak, plus alle
+  vastgemaakte aankondigingen buiten die limiet. Sorteer nieuwste eerst.
+  Behoud al bekende pinned-aankondigingen zolang hun verwijdering of gewijzigde
+  pinned-status niet expliciet uit een volledige respons blijkt.
+- Vat aankondigingen samen in één of twee Nederlandse zinnen. Houd je aan de bron:
+  een vergaderlink is bijvoorbeeld niet automatisch een opname. Laat een mislukte
+  fetch nooit eerder bekende informatie wissen.
+- `synced_at`: het tijdstip van de laatste volledig geslaagde fetch, als ISO-string
+  met expliciete UTC- of Amsterdam-offset. Behoud `quarter` en `courses`.
+
+## Soorten en tijden
+
+| kind | wanneer |
+|---|---|
+| `deadline` | inleveropdracht |
+| `exam` | schriftelijk of mondeling tentamen |
+| `presentation` | presentatie, pitch, poster |
+| `assessment` | beoordelingsmoment van een opdracht |
+| `session` | practicum, werkgroep, LT-spice-sessie |
+| `lecture` | materiaalrelease of collegeblok |
+| `other` | past nergens bij |
+
+Bij twijfel: `other`; verzin geen soort of tijdstip. Voeg alleen aan nieuwe items
+een korte Nederlandse `note` toe als de titel onduidelijk is.
+
+Bewaar tijden als ISO-strings met seconden en expliciete tijdzone (`Z`, `+02:00`
+of `+01:00`). UTC mag rechtstreeks uit de API worden overgenomen; de browser
+rekent weergave, groepering en countdowns in `Europe/Amsterdam` uit, inclusief
+zomer-/wintertijd. Gebruik `allday: true` alleen als de bron dit bevestigt; alleen
+een tijdstip van 07:00 is geen bewijs van een materiaalrelease.
+
+## Validatie en regressies
+
+`bun dashboard-check.ts` valideert het gepubliceerde snapshot; geef een bestandspad
+mee om een candidate te controleren. De gedeelde `dashboard-schema.js` controleert
+arraytypen, verplichte velden, echte ISO-datums met tijdzone, unieke ID's per lijst,
+vakreferenties, soorten, optionele booleans en absolute HTTP(S)-links. De browser
+gebruikt hetzelfde schema voordat hij de cache vervangt.
+
+Voer `bun test` uit voor regressies rond routing, datumlogica, cache en validatie.
 
 ## Nieuw kwartaal
 
-Vervang `quarter`, werk de `courses`-lijst en de courseId-tabel hierboven bij, en begin
-met een schone `items`-lijst (bewaar eventueel nog openstaande handmatige items).
+Werk `quarter`, de `courses`-lijst en de courseId-tabel bij via een normale
+ontwikkelbranch en merge naar `main`. Behoud nog openstaande handmatige items.
+De volgende sync neemt de gepubliceerde configuratie over.

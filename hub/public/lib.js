@@ -1,17 +1,10 @@
 // Gedeelde helpers voor de app-shell. Houd deze module vrij van DOM-logica,
 // zodat de views later portabel blijven (bijv. naar Svelte).
 
-export const TZ = "Europe/Amsterdam";
+import { validateDashboard } from "./dashboard-schema.js";
+export { KINDS } from "./dashboard-schema.js";
 
-export const KINDS = {
-  deadline:     { label: "Inleveren",  cls: "k-deadline" },
-  exam:         { label: "Tentamen",   cls: "k-exam" },
-  presentation: { label: "Presentatie",cls: "k-pres" },
-  assessment:   { label: "Beoordeling",cls: "k-exam" },
-  session:      { label: "Sessie",     cls: "k-session" },
-  lecture:      { label: "Materiaal",  cls: "k-lecture" },
-  other:        { label: "Overig",     cls: "k-lecture" },
-};
+export const TZ = "Europe/Amsterdam";
 
 export const dayFmt   = new Intl.DateTimeFormat("nl-NL", { weekday: "long", day: "numeric", month: "long", timeZone: TZ });
 export const dateFmt  = new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short", timeZone: TZ });
@@ -21,11 +14,16 @@ export const longFmt  = new Intl.DateTimeFormat("nl-NL", { dateStyle: "long", ti
 
 export const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-export const midnight = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const calendarFmt = new Intl.DateTimeFormat("en", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: TZ });
 
-export function dayDiff(due) {
-  const today = midnight(new Date());
-  return Math.round((midnight(due) - today) / 86400000);
+export function dayKey(value = new Date()) {
+  const parts = Object.fromEntries(calendarFmt.formatToParts(new Date(value)).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+export function dayDiff(due, now = new Date()) {
+  // UTC dient hier alleen als rekenas voor kalenderdagen, niet voor lokale middernacht.
+  return (Date.parse(`${dayKey(due)}T00:00:00Z`) - Date.parse(`${dayKey(now)}T00:00:00Z`)) / 86400000;
 }
 
 export function chipFor(diff) {
@@ -38,12 +36,19 @@ export function chipFor(diff) {
 
 let cache = null;
 let cacheAt = 0;
+let pending = null;
 
 export async function loadDashboard(force = false) {
+  if (pending) return pending;
   if (!force && cache && Date.now() - cacheAt < 30 * 60_000) return cache;
-  const res = await fetch("data/dashboard.yaml");
-  if (!res.ok) throw new Error(`data.yaml: HTTP ${res.status}`);
-  cache = jsyaml.load(await res.text());
-  cacheAt = Date.now();
-  return cache;
+  pending = (async () => {
+    const res = await fetch("data/dashboard.yaml", { cache: "no-cache" });
+    if (!res.ok) throw new Error(`data.yaml: HTTP ${res.status}`);
+    // JSON_SCHEMA laat ISO-timestamps strings, net als Bun.YAML in de sync/CI.
+    const data = validateDashboard(jsyaml.load(await res.text(), { schema: jsyaml.JSON_SCHEMA }));
+    cache = data;
+    cacheAt = Date.now();
+    return data;
+  })();
+  try { return await pending; } finally { pending = null; }
 }
