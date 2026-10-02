@@ -1,6 +1,6 @@
 # Dashboard-sync
 
-Het dashboard is de startpagina van `tm.veerhoek.eu/` en leest
+Het dashboard is de startpagina van `tm.allocentric.nl/` en leest
 `hub/public/data/dashboard.yaml`. De dagelijkse OpenChamber-taak `dashboard-sync`
 haalt Brightspace-data op en publiceert alleen een gevalideerd snapshot.
 
