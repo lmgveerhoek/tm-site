@@ -1,0 +1,167 @@
+/* App-shell en dashboardcomponenten; baseert op de tokens uit style.css. */
+
+/* Topbar: sticky, met wordmark en tabnavigatie. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-in { display: flex; align-items: center; gap: 1.75rem; min-height: 3.5rem; }
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--heading);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.wordmark:hover { color: var(--link); }
+.wordmark .logo { display: block; height: 1.6rem; width: auto; }
+.wordmark .logo-text { font: 700 1.05rem/1 Montserrat, "Avenir Next", "Segoe UI", sans-serif; letter-spacing: 0.06em; }
+
+.tabs { display: flex; gap: 1.25rem; margin: 0; } /* style.css geeft elk nav een margin-bottom */
+.tabs a {
+  display: inline-flex;
+  align-items: center;
+  height: 2.1rem;
+  padding-inline: 0.15rem;
+  font: 700 0.9rem/1 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-decoration: none;
+  box-shadow: inset 0 -3px 0 transparent;
+  transition: color 0.15s, box-shadow 0.15s;
+}
+.tabs a:hover, .tabs a:focus-visible { color: var(--link); }
+.tabs a.active { color: var(--link); box-shadow: inset 0 -3px 0 var(--ochre); }
+
+/* Weergavewissel: korte fade, behalve bij prefers-reduced-motion. */
+#view.view-in { animation: viewIn 150ms ease-out; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { #view.view-in { animation: none; } }
+
+/* Tijdlijn: dagen met kop + chip, items als regels. */
+.day { margin-bottom: 1.5rem; }
+.day-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+.day-head h3 {
+  margin: 0;
+  font: 700 1rem/1.3 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--heading);
+}
+
+.chip {
+  font: 700 0.72rem/1 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hero) 70%, transparent);
+  color: var(--text);
+  white-space: nowrap;
+}
+.chip-today { background: var(--ochre); color: #1f2a3d; }
+.chip-soon { background: color-mix(in srgb, var(--ochre) 55%, transparent); color: var(--text); }
+.chip-late { background: transparent; box-shadow: inset 0 0 0 1px var(--rule); color: var(--muted); }
+
+.timeline ul { border-top: 1px solid var(--rule); }
+.timeline li { border-bottom: 1px solid var(--rule); }
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 0.25rem;
+  color: var(--link);
+  text-decoration: none;
+  transition: background-color 0.15s, padding 0.15s;
+}
+.item:hover, .item:focus-visible { background: color-mix(in srgb, var(--hero) 55%, transparent); padding-inline: 0.75rem; }
+.item::after { content: none; } /* style.css zet al een ↗ op section li a */
+
+.badge {
+  flex: none;
+  font: 700 0.72rem/1 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.32rem 0.55rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.k-deadline { background: var(--blue); color: #fff; }
+.k-exam { background: var(--ochre); color: #1f2a3d; }
+.k-pres { background: var(--sky-deep); color: var(--navy); }
+.k-session { background: color-mix(in srgb, var(--hero-mark) 80%, transparent); color: var(--text); }
+.k-lecture { background: transparent; box-shadow: inset 0 0 0 1px var(--rule); color: var(--muted); }
+
+.it-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.it-title { font-weight: 700; color: var(--text); }
+.it-title .note { display: block; font-weight: 400; font-size: 0.9rem; color: var(--muted); }
+.it-meta { font-size: 0.9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.it-meta .code { font-weight: 700; margin-right: 0.4rem; }
+.item .arrow { margin-left: auto; font-size: 1.1rem; }
+
+li.done .item { opacity: 0.55; }
+li.done .it-title { text-decoration: line-through; }
+
+.empty { color: var(--muted); margin: 0.5rem 0; }
+
+/* Aankondigingen: per vak een uitklapbaar blok. */
+.ann-course {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  background: var(--surface);
+}
+.ann-course summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  font: 700 1rem/1.3 Montserrat, "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--heading);
+  list-style: none;
+}
+.ann-course summary::-webkit-details-marker { display: none; }
+.ann-course summary::after { content: "▾"; margin-left: auto; color: var(--muted); }
+.ann-course[open] summary::after { content: "▴"; }
+.ann-course summary .code { font-size: 0.8rem; letter-spacing: 0.08em; }
+.ann-count {
+  font: 400 0.8rem/1 Lato, sans-serif;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--hero) 70%, transparent);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+}
+.ann-course ul { border-top: 1px solid var(--rule); }
+.ann-course li { border-bottom: 1px solid var(--rule); }
+.ann-course li:last-child { border-bottom: 0; }
+
+.ann { display: flex; gap: 1rem; padding: 0.75rem 1rem; }
+.ann-date {
+  flex: none;
+  width: 4.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.15rem;
+}
+.ann-body { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.ann-title { font-weight: 700; color: var(--text); }
+.ann-title .pin { font-weight: 400; font-size: 0.85rem; color: var(--muted); }
+.ann-sum { font-size: 0.95rem; color: var(--muted); }
+
+@media (max-width: 34rem) {
+  .item { flex-wrap: wrap; }
+  .it-meta { width: 100%; padding-left: 0.25rem; }
+  .topbar-in { gap: 1rem; }
+}

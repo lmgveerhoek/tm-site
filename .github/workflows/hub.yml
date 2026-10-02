@@ -4,7 +4,7 @@ name: Publish hub
 on:
   push:
     branches: [main]
-    paths: [hub/**, .github/workflows/hub.yml]
+    paths: [hub/**, dashboard-check.ts, .github/workflows/hub.yml]
   workflow_dispatch:
 
 jobs:
@@ -15,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v2
+      - name: Validate dashboard snapshot
+        run: bun dashboard-check.ts
       - name: Deploy
         if: env.HAS_TOKEN == 'true'
         run: bunx wrangler@4 deploy --config hub/wrangler.json
