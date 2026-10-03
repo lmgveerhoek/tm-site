@@ -11,10 +11,17 @@ on:
       zone:
         type: string
         default: allocentric.nl
+      submodules:
+        description: Check out submodules too (needs SUBMODULES_TOKEN for private ones).
+        type: boolean
+        default: false
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: false
       CLOUDFLARE_ACCOUNT_ID:
+        required: false
+      SUBMODULES_TOKEN:
+        description: Fine-grained token with read access to private submodule repos.
         required: false
 
 jobs:
@@ -33,6 +40,8 @@ jobs:
           # Full history without blobs: build.ts dates each document by its last commit.
           fetch-depth: 0
           filter: blob:none
+          submodules: ${{ inputs.submodules && 'recursive' || false }}
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
 
       - name: Check out generator
         uses: actions/checkout@v4

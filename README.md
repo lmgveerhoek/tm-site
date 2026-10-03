@@ -161,6 +161,9 @@ stops at the first oversized document.
 
 ## Setup
 
+A course repo with submodules passes `with: { submodules: true }` in its `site.yml`. For a private submodule it also needs the secret `SUBMODULES_TOKEN`: a fine-grained token with read-only Contents access to that submodule repo.
+
+
 Each course repo and this repo need the Actions secrets `CLOUDFLARE_API_TOKEN`
 (template "Edit Cloudflare Workers", including Workers Routes write access on the
 `allocentric.nl` zone) and `CLOUDFLARE_ACCOUNT_ID`. The zone must be active in the
