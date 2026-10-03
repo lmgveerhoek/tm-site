@@ -3,7 +3,7 @@
 # Handmatige items: source: manual, met een eigen id (bijv. manual-1).
 # Soorten (kind): deadline | exam | presentation | assessment | session | lecture | other
 
-synced_at: 2026-10-01T17:05:00+02:00
+synced_at: 2026-10-03T07:32:23+02:00
 quarter: 2026/27 · Q1
 
 courses:
@@ -14,15 +14,6 @@ courses:
   - { code: TM10012, name: "Quality, Safety and UX in Healthcare", slug: qsux }
 
 items:
-  - id: bs-187409
-    source: brightspace
-    course: TM12001
-    kind: deadline
-    title: "LT-Spice Assignment 5 - 2026/2027"
-    due: 2026-10-02T23:59:59+02:00
-    url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=187409&grpid=0&ou=844795
-    done: false
-
   - id: bse-483152
     source: brightspace
     course: TM12001
@@ -130,7 +121,7 @@ announcements:
     course: TM10012
     title: "Introcollege patiëntveiligheid "
     posted: 2026-09-17T09:23:00+02:00
-    summary: "Teams-opname van het introductiecollege patiëntveiligheid (17 sep) beschikbaar."
+    summary: "Teams-link naar het introductiecollege patiëntveiligheid van 17 september (15.15 uur)."
     pinned: false
 
   - id: bs-428314
@@ -194,4 +185,11 @@ announcements:
     title: Start Patient Cases 2026/2027
     posted: 2026-08-28T16:00:00+02:00
     summary: "Aftrap van het vak: vijf patiëntcasussen, dinsdagonderwijs in twee tracks. Werkgroepindeling onder Groups; vragen naar Marije van den Boogaard en Melle van Hoffe."
+    pinned: false
+
+  - id: bs-425834
+    course: TM12004
+    title: "Welcome to TM12004"
+    posted: 2025-08-18T11:46:00+02:00
+    summary: "Welkomstbericht: Brightspace is het hoofdcommunicatiekanaal van het vak; vragen kunnen per mail naar het onderwijsteam."
     pinned: false
