@@ -3,7 +3,7 @@
 # Handmatige items: source: manual, met een eigen id (bijv. manual-1).
 # Soorten (kind): deadline | exam | presentation | assessment | session | lecture | other
 
-synced_at: 2026-10-05T07:32:39+02:00
+synced_at: 2026-10-08T07:33:39+02:00
 quarter: 2026/27 · Q1
 
 courses:
@@ -14,45 +14,6 @@ courses:
   - { code: TM10012, name: "Quality, Safety and UX in Healthcare", slug: qsux }
 
 items:
-  - id: bse-483152
-    source: brightspace
-    course: TM12001
-    kind: session
-    title: "LT-spice- Instrumentation amplifier"
-    due: 2026-10-05T12:00:00+02:00
-    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
-    done: false
-
-  - id: bse-457205
-    source: brightspace
-    course: TM12001
-    kind: lecture
-    title: "Excercises - Lecture 6 + answers"
-    due: 2026-10-05T13:00:00+02:00
-    note: Materiaal verschijnt.
-    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
-    done: false
-
-  - id: bs-174767
-    source: brightspace
-    course: TM10006
-    kind: deadline
-    title: "Huisartsbrief - Patient case 1"
-    due: 2026-10-06T17:00:00+02:00
-    url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=174767&grpid=0&ou=844835
-    done: false
-
-  - id: bse-457218
-    source: brightspace
-    course: TM12001
-    kind: lecture
-    title: "Week 7: Noise, interference and other non-idealities & Sensors"
-    due: 2026-10-08T07:00:00+02:00
-    allday: true
-    note: Materiaal week 7 verschijnt.
-    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
-    done: false
-
   - id: bs-188671
     source: brightspace
     course: TM12001
@@ -71,6 +32,56 @@ items:
     url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=187410&grpid=0&ou=844795
     done: false
 
+  - id: bse-457248
+    source: brightspace
+    course: TM12001
+    kind: lecture
+    title: "Lecture 7 - Exercise + answer"
+    due: 2026-10-12T12:00:00+02:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
+    done: false
+
+  - id: bse-457292
+    source: brightspace
+    course: TM12001
+    kind: lecture
+    title: "answers Ch22 (lecture7)"
+    due: 2026-10-13T13:00:00+02:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
+    done: false
+
+  - id: bse-486082
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "Voorbeeld Rollen voor Practica Anamnese en LO_2026"
+    due: 2026-10-27T09:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
+  - id: bse-486083
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 1"
+    due: 2026-10-27T17:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
+  - id: bse-486087
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "AANVULLEND ONDERZOEK ECG, ECHO, LAB, XECG LONGFUNCTIE_2026"
+    due: 2026-10-30T09:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
   - id: bs-174983
     source: brightspace
     course: TM12004
@@ -79,6 +90,36 @@ items:
     due: 2026-11-02T23:59:59+01:00
     note: Eindopdracht DSD.
     url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=174983&grpid=0&ou=844797
+    done: false
+
+  - id: bse-486084
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 2"
+    due: 2026-11-03T17:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
+  - id: bse-486085
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 3"
+    due: 2026-11-03T17:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
+  - id: bse-486086
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "HARTCATHETERISATIE_2026"
+    due: 2026-11-03T17:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
     done: false
 
   - id: bse-476656
@@ -102,7 +143,34 @@ items:
     url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=187412&grpid=0&ou=844795
     done: false
 
+  - id: bse-486089
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 4"
+    due: 2026-11-10T17:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
+  - id: bse-486088
+    source: brightspace
+    course: TM10006
+    kind: lecture
+    title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 4 en 5"
+    due: 2026-11-13T17:00:00+01:00
+    note: Materiaal verschijnt.
+    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
+    done: false
+
 announcements:
+  - id: bs-430250
+    course: TM10006
+    title: "Patient Case 2 - Voorbereiding werkgroep 1"
+    posted: 2026-10-07T17:00:00+02:00
+    summary: "Start van patient case 2 over de kortademige patiënt, met focus op anamnese en lichamelijk onderzoek; documenten voor de eerste werkgroep staan online. Dinsdag 13 oktober introductiecollege met patiëntdemonstratie; werkgroepen en practica zijn verplicht."
+    pinned: false
+
   - id: bs-429336
     course: TM12004
     title: "Week 5 gepubliceerd - Let op voorbereiding Practice 6"
@@ -126,7 +194,7 @@ announcements:
 
   - id: bs-428314
     course: TM10012
-    title: Patient Experience Assessment (PEA)
+    title: "Patient Experience Assessment (PEA)"
     posted: 2026-09-14T15:26:00+02:00
     summary: "Uitleg opbouw PEA: introductiecollege + praktische groepsopdracht met verplicht terugkommoment (4x per jaar). Inschrijven per periode, 8 groepen van 4."
     pinned: false
@@ -185,6 +253,13 @@ announcements:
     title: Start Patient Cases 2026/2027
     posted: 2026-08-28T16:00:00+02:00
     summary: "Aftrap van het vak: vijf patiëntcasussen, dinsdagonderwijs in twee tracks. Werkgroepindeling onder Groups; vragen naar Marije van den Boogaard en Melle van Hoffe."
+    pinned: false
+
+  - id: bs-430527
+    course: TM12001
+    title: "Informatie Instrumentation Amplifier"
+    posted: 2025-10-06T12:31:00+02:00
+    summary: "Open-source boek over elektronische instrumentatie (nog in ontwikkeling) als aanvulling op het boek van Storey; met name hoofdstuk 8 is nuttig."
     pinned: false
 
   - id: bs-425834
