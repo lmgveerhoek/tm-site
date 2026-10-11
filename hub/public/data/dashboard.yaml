@@ -3,7 +3,7 @@
 # Handmatige items: source: manual, met een eigen id (bijv. manual-1).
 # Soorten (kind): deadline | exam | presentation | assessment | session | lecture | other
 
-synced_at: 2026-10-08T07:33:39+02:00
+synced_at: 2026-10-11T20:36:40+02:00
 quarter: 2026/27 · Q1
 
 courses:
@@ -14,24 +14,6 @@ courses:
   - { code: TM10012, name: "Quality, Safety and UX in Healthcare", slug: qsux }
 
 items:
-  - id: bs-188671
-    source: brightspace
-    course: TM12001
-    kind: deadline
-    title: Electronics Challenge
-    due: 2026-10-09T17:00:00+02:00
-    url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=188671&grpid=0&ou=844795
-    done: false
-
-  - id: bs-187410
-    source: brightspace
-    course: TM12001
-    kind: deadline
-    title: "LT-Spice Assignment 6 - 2026/2027"
-    due: 2026-10-09T23:59:59+02:00
-    url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=187410&grpid=0&ou=844795
-    done: false
-
   - id: bse-457248
     source: brightspace
     course: TM12001
@@ -50,6 +32,15 @@ items:
     due: 2026-10-13T13:00:00+02:00
     note: Materiaal verschijnt.
     url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
+    done: false
+
+  - id: bs-188671
+    source: brightspace
+    course: TM12001
+    kind: deadline
+    title: Electronics Challenge
+    due: 2026-10-15T17:00:00+02:00
+    url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=188671&grpid=0&ou=844795
     done: false
 
   - id: bse-486082
