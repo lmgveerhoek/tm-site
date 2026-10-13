@@ -3,7 +3,7 @@
 # Handmatige items: source: manual, met een eigen id (bijv. manual-1).
 # Soorten (kind): deadline | exam | presentation | assessment | session | lecture | other
 
-synced_at: 2026-10-12T07:33:18+02:00
+synced_at: 2026-10-13T07:32:57+02:00
 quarter: 2026/27 · Q1
 
 courses:
@@ -14,16 +14,6 @@ courses:
   - { code: TM10012, name: "Quality, Safety and UX in Healthcare", slug: qsux }
 
 items:
-  - id: bse-457248
-    source: brightspace
-    course: TM12001
-    kind: lecture
-    title: "Lecture 7 - Exercise + answer"
-    due: 2026-10-12T12:00:00+02:00
-    note: Materiaal verschijnt.
-    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
-    done: false
-
   - id: bse-457292
     source: brightspace
     course: TM12001
@@ -155,6 +145,20 @@ items:
     done: false
 
 announcements:
+  - id: bs-430979
+    course: TM10004
+    title: "Resultaten toets groep 1"
+    posted: 2026-10-12T19:27:00+02:00
+    summary: "Alle toetsresultaten van groep 1 staan in Osiris. Heb jij geen resultaat, dan moeten enkele onderdelen opnieuw getoetst worden; neem contact op met skillsplaza@erasmusmc.nl."
+    pinned: false
+
+  - id: bs-430924
+    course: TM12004
+    title: "LET OP - inschrijving tentamen"
+    posted: 2026-10-12T13:37:00+02:00
+    summary: "Herinnering: schrijf je uiterlijk woensdag 14 oktober in voor het tentamen van TM12004. Een oefententamen komt uiterlijk woensdag 21 oktober beschikbaar."
+    pinned: false
+
   - id: bs-430250
     course: TM10006
     title: "Patient Case 2 - Voorbereiding werkgroep 1"
