@@ -3,7 +3,7 @@
 # Handmatige items: source: manual, met een eigen id (bijv. manual-1).
 # Soorten (kind): deadline | exam | presentation | assessment | session | lecture | other
 
-synced_at: 2026-10-13T07:32:57+02:00
+synced_at: 2026-10-14T07:32:28+02:00
 quarter: 2026/27 · Q1
 
 courses:
@@ -14,16 +14,6 @@ courses:
   - { code: TM10012, name: "Quality, Safety and UX in Healthcare", slug: qsux }
 
 items:
-  - id: bse-457292
-    source: brightspace
-    course: TM12001
-    kind: lecture
-    title: "answers Ch22 (lecture7)"
-    due: 2026-10-13T13:00:00+02:00
-    note: Materiaal verschijnt.
-    url: https://brightspace.tudelft.nl/d2l/le/calendar/844795
-    done: false
-
   - id: bs-188671
     source: brightspace
     course: TM12001
@@ -124,22 +114,12 @@ items:
     url: https://brightspace.tudelft.nl/d2l/lms/dropbox/user/folder_submit_files.d2l?db=187412&grpid=0&ou=844795
     done: false
 
-  - id: bse-486089
-    source: brightspace
-    course: TM10006
-    kind: lecture
-    title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 4"
-    due: 2026-11-10T17:00:00+01:00
-    note: Materiaal verschijnt.
-    url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
-    done: false
-
   - id: bse-486088
     source: brightspace
     course: TM10006
     kind: lecture
     title: "PATIENT CASE 2 - 2026 - Dyspnoe Antwoorden Kader 4 en 5"
-    due: 2026-11-13T17:00:00+01:00
+    due: 2026-11-10T17:00:00+01:00
     note: Materiaal verschijnt.
     url: https://brightspace.tudelft.nl/d2l/le/calendar/844835
     done: false
